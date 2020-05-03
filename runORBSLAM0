@@ -1,0 +1,47 @@
+REPNUM=5
+CPATH=`pwd`
+FDIR=/media/yuheng/74123e5f-dc58-4223-9aa8-60f21c431fb1/tartanair_test
+for MOD in `ls $FDIR`
+do
+  for VARIABLE in `ls $FDIR/$MOD`
+  do
+    for ENV in `ls $FDIR/$MOD/$VARIABLE`
+      do
+      echo $FDIR/$MOD/$VARIABLE/$ENV
+      python addingtimes.py $FDIR/$MOD/$VARIABLE/$ENV
+      mkdir -p $CPATH/testing_trajactory/mono/$MOD/$VARIABLE/$ENV
+      for REPEAT in $(seq 0 $REPNUM)
+        do
+        if [[ -f "$CPATH/testing_trajactory/mono/$MOD/$VARIABLE/$ENV/$REPEAT.txt" ]];
+        then
+            echo "$CPATH/testing_trajactory/mono/$MOD/$VARIABLE/$ENV/$REPEAT.txt exists on your filesystem."
+        else
+        /home/yuheng/project/ORB_SLAM2/Examples/Monocular/mono_kitti /home/yuheng/project/ORB_SLAM2/Vocabulary/ORBvoc.txt /home/yuheng/project/ORB_SLAM2/Examples/Tartanair.yaml $FDIR/$MOD/$VARIABLE/$ENV $CPATH/testing_trajactory/mono/$MOD/$VARIABLE/$ENV/$REPEAT.txt
+        fi
+      done
+    done
+  done
+done
+
+FDIR=/media/yuheng/74123e5f-dc58-4223-9aa8-60f21c431fb1/tartanair_test
+for MOD in `ls $FDIR`
+do
+  for VARIABLE in `ls $FDIR/$MOD`
+  do
+    for ENV in `ls $FDIR/$MOD/$VARIABLE`
+      do
+      echo $FDIR/$MOD/$VARIABLE/$ENV
+      python addingtimes.py $FDIR/$MOD/$VARIABLE/$ENV
+      mkdir -p $CPATH/testing_trajactory/stereo/$MOD/$VARIABLE/$ENV
+      for REPEAT in $(seq 0 $REPNUM)
+        do
+        if [[ -f "$CPATH/testing_trajactory/stereo/$MOD/$VARIABLE/$ENV/$REPEAT.txt" ]];
+        then
+            echo "$CPATH/testing_trajactory/stereo/$MOD/$VARIABLE/$ENV/$REPEAT.txt exists on your filesystem."
+        else
+        /home/yuheng/project/ORB_SLAM2/Examples/Stereo/stereo_kitti /home/yuheng/project/ORB_SLAM2/Vocabulary/ORBvoc.txt /home/yuheng/project/ORB_SLAM2/Examples/Tartanair_stereo.yaml $FDIR/$MOD/$VARIABLE/$ENV $CPATH/testing_trajactory/stereo/$MOD/$VARIABLE/$ENV/$REPEAT.txt
+        fi
+      done
+    done
+  done
+done

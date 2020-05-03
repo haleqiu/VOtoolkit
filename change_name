@@ -1,0 +1,21 @@
+CPATH=`pwd`
+  for VARIABLE in `ls $CPATH`
+    do
+    if [ -d $VARIABLE ]
+    then
+      cd $VARIABLE
+      if [ -f Data_easy-P000-0-quat.txt ];
+      then
+        mkdir "../temp";
+        mv *-quat.txt "../temp";
+        cd ..
+        rm -r $VARIABLE
+        mv temp $VARIABLE
+        cd $VARIABLE
+        rename 's/-quat//g' *-quat.txt
+        echo $VARIABLE
+      fi
+      cd ..
+    fi
+
+  done

@@ -43,7 +43,7 @@ for filename in listdir(join(args.inputdir, "bag")):
         fout=cv2.VideoWriter(outvidfile, fourcc, 30.0, image_size)
 
     bag = rosbag.Bag(filepathname, 'r')
-    subfolder = "image_0"## TODO
+    subfolder = "image_1"## TODO cam1 is right image in airsim hhh
     for t in args.topics:
         ind = 0
         time_txt = open(join(local_path, subfolder,"times.txt"), "a")
@@ -62,7 +62,7 @@ for filename in listdir(join(args.inputdir, "bag")):
                     time_stamp = str(msg.header.stamp.secs) + "." + str(msg.header.stamp.nsecs)
                     time_txt.write(time_stamp + "\n")
             ind = ind + 1
-        subfolder = "image_1"
+        subfolder = "image_0"
         time_txt.close()
     bag.close()
 

@@ -10,7 +10,7 @@ import argparse
 # Arguements
 # TODO not consistent
 parser = argparse.ArgumentParser(description='save ros bag')
-parser.add_argument("--topics", type=str, default=['/cam_image/0/camera_pose'], help="topic", nargs= "+")## multiple
+parser.add_argument("--topics", type=str, default=['/cam_image/1/camera_pose'], help="topic", nargs= "+")## multiple
 parser.add_argument("--outdir", type=str, default='/data/dynamic_person/txt', help="where to save the txt")
 parser.add_argument("--inputdir", type=str, default='/data/dynamic_person/', help="the folder for input bag file")
 args = parser.parse_args(); print(args)

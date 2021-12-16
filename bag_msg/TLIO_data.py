@@ -30,11 +30,16 @@ def save_(save_obj, file_path):
 if __name__ == "__main__":
     input_bag_files = glob(args.inputdir + "/*.bag")
     for filename in input_bag_files:
-        local_path = join(args.inputdir,filename.split('.')[0])
-        if not isdir(local_path):
-            mkdir(local_path)
-        outputdir = local_path
-        print(outputdir)
+
+        ### check if output to the local directory
+        if not args.outdir:
+            local_path = join(args.inputdir,filename.split('.')[0])
+            if not isdir(local_path):
+                mkdir(local_path)
+            outputdir = local_path
+        else:
+            outputdir = args.outdir
+        print("output directory: "outputdir)
         if not isdir(outputdir):
             mkdir(outputdir)
 

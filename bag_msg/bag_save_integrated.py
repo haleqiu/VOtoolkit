@@ -12,13 +12,6 @@ from glob import glob as glob
 import argparse
 
 
-# Arguements
-parser = argparse.ArgumentParser(description='save ros bag')
-parser.add_argument("--topics", type=str, default=['/cam_image/2/depthplanner'], help="topic", nargs= "+")## multiple
-parser.add_argument("--outdir", type=str, default=None, help="where to save the txt")
-parser.add_argument("--inputdir", type=str, help="the folder for input bag file")
-args = parser.parse_args(); print(args)
-
 def read_bag_message(bag_path):
     print(bag_path)
     bag = rosbag.Bag(bag_path, 'r')
@@ -50,8 +43,16 @@ def save_(save_obj, file_path):
             time_txt.write(o + "\n")
 
 if __name__ == "__main__":
+    # Arguements
+    parser = argparse.ArgumentParser(description='save ros bag')
+    parser.add_argument("--topics", type=str, default=['/cam_image/2/depthplanner'], help="topic", nargs= "+")## multiple
+    parser.add_argument("--outdir", type=str, default=None, help="where to save the txt")
+    parser.add_argument("--inputdir", type=str, help="the folder for input bag file")
+    args = parser.parse_args(); print(args)
+
     input_bag_files = glob(args.inputdir + "/*.bag")
     for filename in input_bag_files:
+        
         local_path = join(args.inputdir,filename.split('.')[0])
         if not isdir(local_path):
             mkdir(local_path)

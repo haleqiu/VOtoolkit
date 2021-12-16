@@ -14,13 +14,6 @@ import argparse
 from bag_save_integrated import read_integrated
 from bag_save_IMU import read_imu
 
-# Arguements
-parser = argparse.ArgumentParser(description='save ros bag')
-parser.add_argument("--topics", type=str, default=['/cam_image/2/depthplanner'], help="topic", nargs= "+")## multiple
-parser.add_argument("--outdir", type=str, default=None, help="where to save the txt")
-parser.add_argument("--inputdir", type=str, help="the folder for input bag file")
-args = parser.parse_args(); print(args)
-
 
 def save_(save_obj, file_path):
     with open(file_path, "w") as time_txt:
@@ -28,23 +21,31 @@ def save_(save_obj, file_path):
             time_txt.write(o + "\n")
 
 if __name__ == "__main__":
+    # Arguements
+    parser = argparse.ArgumentParser(description='save ros bag')
+    parser.add_argument("--topics", type=str, default=['/cam_image/2/depthplanner'], help="topic", nargs= "+")## multiple
+    parser.add_argument("--outdir", type=str, default=None, help="where to save the txt")
+    parser.add_argument("--inputdir", type=str, help="the folder for input bag file")
+    args = parser.parse_args(); print(args)
     input_bag_files = glob(args.inputdir + "/*.bag")
-    for filename in input_bag_files:
+    for file_path in input_bag_files:
 
         ### check if output to the local directory
+        filename = file_path.split('.')[0].split("/")[-1]
         if not args.outdir:
-            local_path = join(args.inputdir,filename.split('.')[0])
-            if not isdir(local_path):
-                mkdir(local_path)
-            outputdir = local_path
+            local_path = join(args.inputdir,filename)
         else:
-            outputdir = args.outdir
-        print("output directory: "outputdir)
+            local_path = join(args.outdir,filename)
+        
+        if not isdir(local_path):
+            mkdir(local_path)
+        outputdir = local_path
+        print("output directory: ", outputdir)
         if not isdir(outputdir):
             mkdir(outputdir)
 
-        t_int, pose = read_integrated(filename)
-        t_imu, orin, acc, angular = read_imu(filename, None)
+        t_int, pose = read_integrated(file_path)
+        t_imu, orin, acc, angular = read_imu(file_path, None)
 
         ## dataindexing
         integrate_index = 1

@@ -30,7 +30,7 @@ def read_integrated(bag_path, t_list =['/integrated_to_init/'] , skip = 1):
     pose = []
     bag = rosbag.Bag(bag_path, 'r')
     for topic, msg, t in bag.read_messages(topics=t_list):
-        
+        print(msg)
         pose.append(np.array([msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z, 
         msg.pose.pose.orientation.x, msg.pose.pose.orientation.y, msg.pose.pose.orientation.z, msg.pose.pose.orientation.w]))
         time_stamp.append((msg.header.stamp.secs) + (1.0e-9 * msg.header.stamp.nsecs)) # raw time 

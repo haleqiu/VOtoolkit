@@ -6,19 +6,13 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import rosbag
 import numpy as np
-from os.path import isfile, join, dirname, isdir
-from os import listdir, mkdir, walk
+import os
+from os.path import join
+from os import listdir
 import argparse
 
-# Arguements
-parser = argparse.ArgumentParser(description='save ros bag')
-parser.add_argument("--topics", type=str, default=['/cam_image/2/depthplanner', '/cam_image/1/depthplanner'], help="topic", nargs= "+")## multiple
-parser.add_argument("--outdir", type=str, default='/data/dynamic_person/', help="where to save the txt")
-parser.add_argument("--inputdir", type=str, default='/data/dynamic_person/', help="the folder for input bag file")
-args = parser.parse_args(); print(args)
 
-
-def save_depth(bag_path, outfolder, t_list =['/cam_image/0/depthplanner'] , SaveVideo = False, skip = 1):
+def save_depth(bag_path, outfolder, t_list =['/cam_image/0/depthplanner'], SaveVideo = False, skip = 1):
     # This function is ran for single msg like the depth of the left camera.
     if SaveVideo:
         outvidfile = outfolder+'.avi'
@@ -36,9 +30,9 @@ def save_depth(bag_path, outfolder, t_list =['/cam_image/0/depthplanner'] , Save
             if SaveVideo:
                 fout.write(image_np)
             else:
-                imagename = filename+'_'+str(ind)+'.png'
+                imagename = "%06d"%(ind)+".png"
                 cv2.imwrite(join(outputdir,imagename), image_np)
-                np.savetxt(join(outputdir,str(ind)+'.txt'),image_np)
+                np.save(join(outputdir,"%06d"%(ind)),image_np)
 
         ind = ind + 1
     bag.close()
@@ -50,15 +44,25 @@ def save_depth(bag_path, outfolder, t_list =['/cam_image/0/depthplanner'] , Save
 
 if __name__ == "__main__":
 
+    # Arguements
+    parser = argparse.ArgumentParser(description='save ros bag')
+    parser.add_argument("--topics", type=str, default=['/cam_image/2/depthplanner', '/cam_image/1/depthplanner'], help="topic", nargs= "+")## multiple
+    parser.add_argument("--outdir", type=str, default=None, help="where to save the txt")
+    parser.add_argument("--inputdir", type=str, default='/data/dynamic_person/', help="the folder for input bag file")
+    args = parser.parse_args(); print(args)
+
     cvbridge = CvBridge()
     SaveVideo = False
     image_size = (360,640)
-    for filename in listdir(join(args.inputdir, "bag")):
+    for filename in os.listdir(join(args.inputdir, "bag")):
         local_path = join(args.inputdir,filename.split('.')[0])
-        outputdir = join(local_path, "depth")
+        if not args.outdir:
+            outputdir = join(local_path, "depth")
+        else:
+            outputdir = join(args.outdir, "depth")
+
         print(outputdir)
-        if not isdir(outputdir):
-            mkdir(outputdir)
+        os.makedirs(outputdir, exist_ok = True)
 
         bag_path = join(join(args.inputdir,"bag"),filename)
         time_stamp = save_depth(bag_path,outputdir,t_list=[args.topics[0]])

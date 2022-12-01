@@ -1,6 +1,6 @@
 ## NOTE this file should run with 
 
-import cv2
+# import cv2
 import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
@@ -10,6 +10,7 @@ from os.path import isfile, join, dirname, isdir
 from os import listdir, mkdir, walk
 from glob import glob as glob
 import argparse
+import pickle
 
 
 def read_bag_message(bag_path):
@@ -47,12 +48,14 @@ def save_(save_obj, file_path):
 if __name__ == "__main__":
     # Arguements
     parser = argparse.ArgumentParser(description='save ros bag')
-    parser.add_argument("--topics", type=str, default=['/cam_image/2/depthplanner'], help="topic", nargs= "+")## multiple
+    parser.add_argument("--topics", type=str, default=['/imu/data'], help="topic", nargs= "+")## multiple
     parser.add_argument("--outdir", type=str, default=None, help="where to save the txt")
     parser.add_argument("--inputdir", type=str, help="the folder for input bag file")
     args = parser.parse_args(); print(args)
 
-    input_bag_files = glob(args.inputdir + "/*.bag")
+    input_bag_files = glob(args.inputdir + "/*/*.bag")
+    print(args.inputdir + "/*/*.bag")
+    print(input_bag_files)
     for filename in input_bag_files:
         local_path = join(args.inputdir,filename.split('.')[0])
         if not isdir(local_path):
@@ -69,6 +72,17 @@ if __name__ == "__main__":
         np.savetxt(join(outputdir, "orientation.txt"),orin)
         np.savetxt(join(outputdir, "acceleration.txt"),acc)
         np.savetxt(join(outputdir, "angular_velocity.txt"),angular)
+        data = {
+            'time_stamp':t,
+            'orientation':orin,
+            'acc':acc,
+            'gyro':angular, 
+        }
+        with open(join(outputdir, "data.pkl"), 'wb') as file:
+            pickle.dump(data,file)
+            print("save datapkl ", join(outputdir, "data.pkl"))
+
+        
 
         #with open(join(outputdir,"rawtimes.txt"), "w") as time_txt:
         #    for time in time_stamp:

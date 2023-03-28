@@ -31,7 +31,6 @@ if __name__ == "__main__":
         print(outputdir)
 
         os.makedirs(outputdir, exist_ok=True)
-        # read_bag_message(filename)
 
         t, pose = read_pose(filename, args.topics)
         pose_data = np.concatenate([t, pose], axis=-1)

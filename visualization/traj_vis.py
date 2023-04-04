@@ -10,7 +10,10 @@ from tqdm import tqdm
 import glob
 import os
 import pypose as pp
-
+import sys
+import argparse
+sys.path.append('..')
+from evaluation import TartanAirEvaluator
 
 
 def create_gif_from_image_lists(image_lists, image_labels, gif_fname, fps=1):
@@ -130,23 +133,43 @@ def create_trajectory_summary_video(results, image_lists, data_lists, data_names
     # WHOOPS(yoraish): image labels currently unused.
     create_gif_from_image_lists(image_lists + [ traj_img_list, data_plot_image_list], ['raw', 'traj', 'est flow', 'stats'], gif_path, fps=10)
 
+def rescale_trajectory(traj, scale_factor = 1.0):
+    init_pose = traj[0]
+    traj = init_pose.Inv() @ traj
+    traj = traj.numpy()
+    traj[:,:3] = traj[:,:3] * scale_factor
+    traj = pp.SE3(traj)
+    traj = init_pose @ traj
+    traj[:, :3] *= scale_factor
+    return traj
+
 if __name__ == "__main__":
     # Create a dummy image list.
-    est_traj_path = "/Users/pro/project/tartanair_tools/results_tartanair/Data_easy_P000_taext.txt"
-    gt_traj_path = "/Users/pro/project/tartanair_tools/results_tartanair/Data_easy_P000_gt.txt"
-    image_root_path = "/Users/pro/project/tartanair_tools/P000_image_lcam_front"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--expname", type=str, default="Data_easy_P000", help="experiment name")
+    parser.add_argument("--exp_dir", type=str, default="/Users/pro/project/tartanair_tools/results_tartanair", help="experiment directory")
+    parser.add_argument("--est_traj_path", type=str, default=None, help="path for estimated trajectory")
+    parser.add_argument("--gt_traj_path", type=str, default=None, help="gt path for ground truth trajectory")
+    parser.add_argument("--image_root_path", type=str, default="/Users/pro/project/tartanair_tools/P000_image_lcam_front", help="image for estimated trajectory")
+    parser.add_argument("--output_fpath", type=str, default="test.gif", help="output file path")
+    args = parser.parse_args(); print(args)
+
+    if args.est_traj_path is None:
+        est_traj_path = os.path.join(args.exp_dir, args.expname + "_taext.txt")
+    if args.gt_traj_path is None:
+        gt_traj_path = os.path.join(args.exp_dir, args.expname + "_gt.txt")
+    image_root_path = args.image_root_path
+    aicrowd_evaluator = TartanAirEvaluator()
+
+    result = aicrowd_evaluator.evaluate_one_trajectory(gt_traj_path, est_traj_path, scale=True)
+    scale_factor = result['scale']
+    print(result)
 
     images_path = glob.glob(os.path.join(image_root_path, "*.png"))
     images_path.sort()
     img_len = len(images_path)
     image_list = []
 
-    T_NED_EDN = np.array([[0,1,0,0],
-                        [0,0,1,0],
-                        [1,0,0,0],
-                        [0,0,0,1]], dtype=np.float32)
-    T_NED_EDN = pp.mat2SE3(T_NED_EDN)
-    
     for i, p in enumerate(images_path):
         im = cv2.imread(p)
         im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
@@ -162,15 +185,9 @@ if __name__ == "__main__":
 
     est_traj = pp.SE3(est_traj)
     gt_traj = pp.SE3(gt_traj)
-    init = est_traj[0]
 
-    est_traj = init.Inv() @ est_traj
-    est_traj = est_traj.numpy()
-    est_traj[:,:3] = est_traj[:,:3] * 2.366322147886725
-    est_traj = pp.SE3(est_traj)
-    est_traj = init @ est_traj
-
-    # gt_traj = gt_traj[0].Inv() @ gt_traj
+    # scaling of the estimated trajector
+    est_traj = rescale_trajectory(est_traj, scale_factor = scale_factor)
 
     est_traj = est_traj.numpy()
     gt_traj = gt_traj.numpy()
@@ -181,4 +198,4 @@ if __name__ == "__main__":
     }
 
     # Create the GIF.
-    create_trajectory_summary_video(results, [image_list], [data_list1, data_list2], ['samples', 'samples'], "test.gif")
+    create_trajectory_summary_video(results, [image_list], [data_list1, data_list2], ['samples', 'samples'], args.output_fpath)

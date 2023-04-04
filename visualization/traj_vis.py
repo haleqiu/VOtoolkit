@@ -140,7 +140,6 @@ def rescale_trajectory(traj, scale_factor = 1.0):
     traj[:,:3] = traj[:,:3] * scale_factor
     traj = pp.SE3(traj)
     traj = init_pose @ traj
-    traj[:, :3] *= scale_factor
     return traj
 
 if __name__ == "__main__":

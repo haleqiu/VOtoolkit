@@ -12,6 +12,7 @@ import os
 import pypose as pp
 import sys
 import argparse
+from PIL import Image
 sys.path.append('..')
 from evaluation import TartanAirEvaluator
 
@@ -46,7 +47,10 @@ def create_gif_from_image_lists(image_lists, image_labels, gif_fname, fps=1):
         frames.append(frame)
 
     # Create gif.
-    imageio.mimsave(gif_fname, frames, fps=fps)
+    # imageio.mimsave(gif_fname, frames, fps=fps)
+    frames = [Image.fromarray(img) for img in frames]
+    frames[0].save(gif_fname, format='GIF', append_images=frames, quality=50, 
+         save_all=True, duration=15, loop=0, optimize=True)
 
 
 def create_trajectory_summary_video(results, image_lists, data_lists, data_names, output_fpath):
@@ -124,6 +128,8 @@ def create_trajectory_summary_video(results, image_lists, data_lists, data_names
 
         # Clear the plot.
         plt.close(fig2)
+        plt.cla()
+        plt.clf()
 
     # Create the GIF.
     timenow = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -162,7 +168,7 @@ if __name__ == "__main__":
 
     result = aicrowd_evaluator.evaluate_one_trajectory(gt_traj_path, est_traj_path, scale=True)
     scale_factor = result['scale']
-    print(result)
+    print(result,scale_factor)
 
     images_path = glob.glob(os.path.join(image_root_path, "*.png"))
     images_path.sort()

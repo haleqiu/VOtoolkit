@@ -30,14 +30,14 @@ class TartanAirEvaluator:
         gt_traj_trans, est_traj_trans, s = transform_trajs(gt_traj, est_traj, scale)
         gt_SEs, est_SEs = quats2SEs(gt_traj_trans, est_traj_trans)
 
-        ate_score, gt_ate_aligned, est_ate_aligned = self.ate_eval.evaluate(gt_traj, est_traj, scale)
+        ate_score, gt_ate_aligned, est_ate_aligned, ate_s = self.ate_eval.evaluate(gt_traj, est_traj, scale)
         rpe_score = self.rpe_eval.evaluate(gt_SEs, est_SEs)
         kitti_score = self.kitti_eval.evaluate(gt_SEs, est_SEs)
 
         return {'ate_score': ate_score, 
                 'rpe_score': rpe_score, 
                 'kitti_score': kitti_score,
-                'scale': s}
+                'scale': ate_s}
 
 if __name__ == "__main__":
     

@@ -50,7 +50,7 @@ class ATEEvaluator(object):
             est_traj_aligned.append(se_new)
 
 
-        return error, gt_traj, est_traj_aligned
+        return error, gt_traj, est_traj_aligned, s
 
 # =======================
 

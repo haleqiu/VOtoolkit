@@ -48,7 +48,7 @@ def read_twist(bag_path, t_list =['/integrated_to_init/'] , skip = 1):
     bag.close()
     return np.array(time_stamp)[:,None], np.array(twist)
 
-def read_imu(bag_path, t_list =['/imu/data/'] , skip = 1):
+def read_imu(bag_path, t_list =['/imu/data/']):
     time_stamp = []
     orientation = []
     angular_velocity = []

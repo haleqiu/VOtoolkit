@@ -48,17 +48,21 @@ def read_twist(bag_path, t_list =['/integrated_to_init/'] , skip = 1):
     bag.close()
     return np.array(time_stamp)[:,None], np.array(twist)
 
-def read_imu(bag_path, t_list =['/imu/data/']):
+def read_imu(bag_path, t_list =['/imu/data/'] , skip = 1):
     time_stamp = []
     orientation = []
     angular_velocity = []
     acceleration = []
     bag = rosbag.Bag(bag_path, 'r')
-    print(t_list)
     for topic, msg, t in bag.read_messages(topics=t_list):
-        orientation.append(np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w], dtype=np.float64))
-        acceleration.append(np.array([msg.linear_acceleration.x,msg.linear_acceleration.y,msg.linear_acceleration.z], dtype=np.float64))
-        angular_velocity.append(np.array([msg.angular_velocity.x,msg.angular_velocity.y,msg.angular_velocity.z], dtype=np.float64))
-        time_stamp.append(np.array(msg.header.stamp.secs, dtype=np.float64) + np.array(1.0e-9 * msg.header.stamp.nsecs, dtype=np.float64)) # raw time 
+        orientation.append(np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]))
+        acceleration.append(np.array([msg.linear_acceleration.x,msg.linear_acceleration.y,msg.linear_acceleration.z]))
+        angular_velocity.append(np.array([msg.angular_velocity.x,msg.angular_velocity.y,msg.angular_velocity.z]))
+        time_stamp.append((msg.header.stamp.secs) + (1.0e-9 * msg.header.stamp.nsecs)) # raw time 
     bag.close()
-    return np.array(time_stamp)[:,None], np.array(orientation), np.array(acceleration), np.array(angular_velocity)
+    return {
+        'time_stamp':np.array(time_stamp),
+        'orientation':np.array(orientation),
+        'acc':np.array(acceleration),
+        'gyro':np.array(angular_velocity),
+    }

@@ -9,7 +9,7 @@ from os import listdir, mkdir, walk
 from glob import glob as glob
 import pickle
 
-from utils import read_pose, read_imu
+from utils import read_pose, read_imu, read_twist
 from utils import read_bag_message
 
 if __name__ == "__main__":
@@ -32,13 +32,18 @@ if __name__ == "__main__":
 
         os.makedirs(outputdir, exist_ok=True)
 
-        t, pose = read_pose(filename, args.topics)
-        pose_data = np.concatenate([t, pose], axis=-1)
-        np.savetxt(join(outputdir, "pose.txt"),pose_data)
-        with open(join(outputdir, "pose.pkl"), 'wb') as handle:
-            pickle.dump(pose_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        # t, pose = read_pose(filename, args.topics)
+        # pose_data = np.concatenate([t, pose], axis=-1)
+        # np.savetxt(join(outputdir, "pose.txt"),pose_data)
+        # with open(join(outputdir, "pose.pkl"), 'wb') as handle:
+        #     pickle.dump(pose_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
         
-
+        t, twist = read_twist(filename, args.topics)
+        twist_data = np.concatenate([t, twist], axis=-1)
+        np.savetxt(join(outputdir, "twist.txt"),twist_data)
+        with open(join(outputdir, "twist.pkl"), 'wb') as handle:
+            pickle.dump(twist_data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        
         t, orin, acc, angular = read_imu(filename, ['/sensor_head/gpsins/imu'])
 
         imu_data = np.concatenate([t, acc, angular], axis=-1)

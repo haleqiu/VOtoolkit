@@ -35,6 +35,19 @@ def read_pose(bag_path, t_list =['/integrated_to_init/'] , skip = 1):
     bag.close()
     return np.array(time_stamp)[:,None], np.array(pose)
 
+def read_twist(bag_path, t_list =['/integrated_to_init/'] , skip = 1):
+    time_stamp = []
+    twist = []
+    bag = rosbag.Bag(bag_path, 'r')
+    print(t_list)
+
+    for topic, msg, t in bag.read_messages(topics=t_list):
+        twist.append(np.array([msg.twist.twist.linear.x, msg.twist.twist.linear.y, msg.twist.twist.linear.z, 
+        msg.twist.twist.angular.x, msg.twist.twist.angular.y, msg.twist.twist.angular.z], dtype=np.float64))
+        time_stamp.append(np.array(msg.header.stamp.secs, dtype=np.float64) + np.array(1.0e-9 * msg.header.stamp.nsecs, dtype=np.float64)) # raw time 
+    bag.close()
+    return np.array(time_stamp)[:,None], np.array(twist)
+
 def read_imu(bag_path, t_list =['/imu/data/'] , skip = 1):
     time_stamp = []
     orientation = []

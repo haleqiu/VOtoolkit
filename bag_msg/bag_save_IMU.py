@@ -11,6 +11,7 @@ from os import listdir, mkdir, walk
 from glob import glob as glob
 import argparse
 import pickle
+from utils import read_imu
 
 
 def read_bag_message(bag_path):
@@ -26,19 +27,6 @@ def read_data_type(bag_path, tlist):
         types.append(bag.get_type_and_topic_info()[1][topic][0])
     print(types)
     
-def read_imu(bag_path, outfolder, t_list =['/imu/data/'] , skip = 1):
-    time_stamp = []
-    orientation = []
-    angular_velocity = []
-    acceleration = []
-    bag = rosbag.Bag(bag_path, 'r')
-    for topic, msg, t in bag.read_messages(topics=t_list):
-        orientation.append(np.array([msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]))
-        acceleration.append(np.array([msg.linear_acceleration.x,msg.linear_acceleration.y,msg.linear_acceleration.z]))
-        angular_velocity.append(np.array([msg.angular_velocity.x,msg.angular_velocity.y,msg.angular_velocity.z]))
-        time_stamp.append((msg.header.stamp.secs) + (1.0e-9 * msg.header.stamp.nsecs)) # raw time 
-    bag.close()
-    return np.array(time_stamp), np.array(orientation), np.array(acceleration), np.array(angular_velocity)
 
 def save_(save_obj, file_path):
     with open(file_path, "w") as time_txt:
@@ -79,7 +67,7 @@ if __name__ == "__main__":
             'gyro':angular, 
         }
         with open(join(outputdir, "data.pkl"), 'wb') as file:
-            pickle.dump(data,file)
+            pickle.dump(data,file, protocol=pickle.HIGHEST_PROTOCOL)
             print("save datapkl ", join(outputdir, "data.pkl"))
 
         

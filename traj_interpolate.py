@@ -96,10 +96,7 @@ def interpolate_traj(traj, time_stamp, gt_time):
     traj_ext[idx_end_gt:] = traj_ext[idx_end_gt]
 
     return {'raw_traj': traj.tensor(), 'ext_traj': traj_ext, 'int_traj': traj_ext[idx_start_gt:idx_end_gt]}
-    # np.savetxt(os.path.join(data_folder_path, path_name + "_taraw.txt"), traj_pp.tensor())
-    # np.savetxt(os.path.join(data_folder_path, path_name + "_taext.txt"), dso_traj_ext)
-    # np.savetxt(os.path.join(data_folder_path, path_name + "_gtcrop.txt"), gt_traj[time_stamp.astype(int)])
-    # print("results_tartanair_seg/" + path_name + "_taext.txt")
+
 
 if __name__ == "__main__":
     # Create a dummy image list.

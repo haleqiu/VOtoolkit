@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 def recity_Stereo(map1_x, map1_y, map2_x, map2_y, img1, img2):
 
-    rectified_img1 = vscode-remote://ssh-remote%2Bperceptron.ri.cmu.edu/home/yuhengq/workspace/AirVIO/Config/Sequence/DSTAZED/payload_cam01.yamlcv2.remap(img1, map1_x, map1_y, cv2.INTER_LINEAR)
+    rectified_img1 = cv2.remap(img1, map1_x, map1_y, cv2.INTER_LINEAR)
     rectified_img2 = cv2.remap(img2, map2_x, map2_y, cv2.INTER_LINEAR)
 
     return rectified_img1, rectified_img2

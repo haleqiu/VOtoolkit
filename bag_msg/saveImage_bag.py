@@ -11,8 +11,8 @@ import glob, tqdm
 # Arguements
 parser = argparse.ArgumentParser(description='save ros bag')
 parser.add_argument("--topics", type=str, default=['/zedx/zed_node/left/image_rect_color', '/zedx/zed_node/right/image_rect_color'], help="topic", nargs= "+")## multiple
-parser.add_argument("--outdir", type=str, default='/home/yuhneg/data/dsta_payload_2024-07-08-11-24-41_1/', help="where to save the txt")
-parser.add_argument("--inputdir", type=str, default='/home/yuhneg/data/dsta_payload_bag', help="the folder for input bag file")
+parser.add_argument("--outdir", type=str, default='/home/yuhneg/data/dsta_payload_2024-07-17', help="where to save the txt")
+parser.add_argument("--inputdir", type=str, default='/home/yuhneg/data/dsta_payload/07-19-run1', help="the folder for input bag file")
 args = parser.parse_args(); print(args)
 
 # outvidfile = 'bag_save6.avi'
@@ -31,8 +31,8 @@ for filename in glob.glob(args.inputdir + "/*.bag"):
     local_path = join(args.inputdir,filename.split('.')[0])
     if not isdir(local_path):
         mkdir(local_path)
-        mkdir(join(local_path, "image_0"))
-        mkdir(join(local_path, "image_1"))
+        mkdir(join(local_path, "rbg_l"))
+        mkdir(join(local_path, "rbg_r"))
 
     if SaveVideo:
         outvidfile = subfolder+'.avi'

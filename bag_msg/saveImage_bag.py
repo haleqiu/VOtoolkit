@@ -29,7 +29,7 @@ for filename in glob.glob(args.inputdir + "/*.bag"):
 
     filepathname = join(args.inputdir, "bag", filename)
 
-    local_path = join(args.inputdir,filename.split('.')[0])
+    local_path = join(args.outdir, filename.split('/')[-1])
     if not isdir(local_path):
         mkdir(local_path)
         mkdir(join(local_path, "rgb_l"))

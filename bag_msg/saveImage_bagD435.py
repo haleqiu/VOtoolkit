@@ -9,6 +9,25 @@ from os import listdir, mkdir
 import argparse
 import glob, tqdm
 
+from sensor_msgs.msg import CameraInfo
+
+def camera_info_callback(msg):
+    # This function is called whenever a new message is received on the topic
+    rospy.loginfo("Received CameraInfo message")
+    
+    # Accessing the fields of the CameraInfo message
+    rospy.loginfo(f"Header: {msg.header}")
+    rospy.loginfo(f"Height: {msg.height}")
+    rospy.loginfo(f"Width: {msg.width}")
+    rospy.loginfo(f"Distortion model: {msg.distortion_model}")
+    rospy.loginfo(f"D: {msg.D}")
+    rospy.loginfo(f"K: {msg.K}")
+    rospy.loginfo(f"R: {msg.R}")
+    rospy.loginfo(f"P: {msg.P}")
+    rospy.loginfo(f"binning_x: {msg.binning_x}")
+    rospy.loginfo(f"binning_y: {msg.binning_y}")
+    rospy.loginfo(f"roi: {msg.roi}")
+
 # Arguements
 parser = argparse.ArgumentParser(description='save ros bag')
 parser.add_argument("--topics", type=str, default=['/device_0/sensor_0/Infrared_1/image/data', '/device_0/sensor_0/Infrared_2/image/data'], help="topic", nargs= "+")## multiple
@@ -46,6 +65,18 @@ for filename in glob.glob(args.inputdir + "/*.bag"):
         print(t)
         ind = 0
         time_txt = open(join(local_path, subfolder, "times.txt"), "a")
+
+        # try:
+            # Initialize the ROS node
+        rospy.init_node('camera_info_listener', anonymous=True)
+        
+        # Subscribe to the topic that publishes CameraInfo messages
+        info_topic = t[:-10] + "info/camera_info"
+        print(info_topic)
+        rospy.Subscriber(info_topic, CameraInfo, camera_info_callback)
+        
+        # Keep the node running until it is shut down
+        rospy.spin()
         
         for info in tqdm.tqdm(bag.read_messages(topics=t)):
             topic, msg, t = info

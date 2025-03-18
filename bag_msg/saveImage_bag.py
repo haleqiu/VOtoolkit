@@ -12,7 +12,7 @@ import glob, tqdm
 # Arguements
 parser = argparse.ArgumentParser(description='save ros bag')
 parser.add_argument("--topics", type=str, default=['/zedx/zed_node/left/image_rect_color', '/zedx/zed_node/right/image_rect_color'], help="topic", nargs= "+")## multiple
-parser.add_argument("--outdir", type=str, default='/data2/yuhengq/dsta_payload/2024_08_09/run2/zed_bags', help="where to save the txt")
+parser.add_argument("--outdir", type=str, default='', help="where to save the txt")
 parser.add_argument("--inputdir", type=str, default='/data2/yuhengq/dsta_payload/2024_08_09/run2/zed_bags', help="the folder for input bag file")
 args = parser.parse_args(); print(args)
 
@@ -46,16 +46,18 @@ for filename in glob.glob(args.inputdir + "/*.bag"):
         print(t)
         ind = 0
         time_txt = open(join(local_path, subfolder, "times.txt"), "a")
+        
         for info in tqdm.tqdm(bag.read_messages(topics=t)):
             topic, msg, t = info
             if ind%skip==0:
-                image_np = cvbridge.imgmsg_to_cv2(msg, "bgr8")  # TODO: check the encoding
+                # print(f"Image encoding: {msg.encoding}")
+                image_np = cvbridge.imgmsg_to_cv2(msg, "passthrough")  # TODO: check the encoding
                 if SaveVideo:
                     fout.write(image_np)
                 else:
-                    imagename = "%06d"%ind+'.png'
+                    time_stamp = str(msg.header.stamp.secs) + "_" +  str(msg.header.stamp.nsecs)
+                    imagename = time_stamp + '.png'
                     cv2.imwrite(join(local_path,subfolder, imagename), image_np)
-                    time_stamp = str(msg.header.stamp.secs) + "." + str(msg.header.stamp.nsecs)
                     time_txt.write(time_stamp + "\n")
             ind = ind + 1
         time_txt.close()
